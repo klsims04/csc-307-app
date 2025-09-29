@@ -25,7 +25,7 @@ function TableBody(props) {
           </button>
         </td>
       </tr>
-    );
+     );
   });
 
   return <tbody>{rows}</tbody>;
