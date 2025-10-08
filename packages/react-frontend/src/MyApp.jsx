@@ -30,18 +30,47 @@ function MyApp() {
     return promise;
   }
   function removeOneCharacter(index) {
-    const updated = characters.filter((character, i) => {
-      return i !== index;
-    });
-    setCharacters(updated);
+    const id = characters[index].id;
+
+    fetch(`http://localhost:8000/users/${id}`, { method: "DELETE" })
+      .then(function (res) {
+        if (res.status === 204) {
+          const updated = characters.filter(function (_, i) {
+            return i !== index;
+          });
+          setCharacters(updated);
+        } else if (res.status === 404) {
+          console.log("User not found on backend (404).");
+        } else {
+          console.log("Unexpected status:", res.status);
+        }
+      })
+      .catch(function (error) {
+        console.log("Error deleting user:", error);
+      });
   }
+
   function updateList(person) { 
     postUser(person)
-      .then(() => setCharacters([...characters, person]))
-      .catch((error) => {
-        console.log(error);
-      })
-   }
+      .then(function (res) {
+      if (res.status === 201) {
+        return res.json();         
+      } else {
+        console.log("No update; server returned status:", res.status);
+        return null;                
+      }
+    })
+    .then(function (createdUser) {
+      if (createdUser) {
+        setCharacters(function (prev) {
+          return [...prev, createdUser];
+        });
+      }
+    })
+    .catch(function (error) {
+      console.log("Error adding user:", error);
+    });
+  }
    return (
       <div className="container">
          <Table

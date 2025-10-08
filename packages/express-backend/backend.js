@@ -31,6 +31,24 @@ const findUserByName = (name) => {
   );
 };
 
+function deleteUserById(id) {
+  const idx = users["users_list"].findIndex((u) => u.id === id);
+  if (idx === -1) return false;
+  users["users_list"].splice(idx, 1);
+  return true;
+}
+
+app.delete("/users/:id", (req, res) => {
+  const id = req.params["id"];
+  const removed = deleteUserById(id);
+
+  if (!removed) {
+    res.status(404).send("Resource not found.");
+  } else {
+    res.status(204).end();
+  }
+});
+
 app.get("/users", (req, res) => {
   const name = req.query.name;
   if (name != undefined) {
@@ -76,6 +94,10 @@ app.get("/users", (req, res) => {
   res.send(users);
 });
 
+function generateId() {
+  return Math.floor(Math.random() * 1_000_000).toString();
+}
+
 const addUser = (user) => {
   users["users_list"].push(user);
   return user;
@@ -83,8 +105,13 @@ const addUser = (user) => {
 
 app.post("/users", (req, res) => {
   const userToAdd = req.body;
-  addUser(userToAdd);
-  res.send();
+  let id = generateId();
+  while (users["users_list"].some((u) => u.id === id)) {
+    id = generateId();
+  }
+  userToAdd.id = id;
+  const newUser = addUser(userToAdd);
+  res.status(201).json(newUser);
 });
 
 app.listen(port, () => {
