@@ -1,0 +1,17 @@
+{
+  "name": "jest-unit-testing",
+  "version": "1.0.0",
+  "description": "",
+  "main": "module.js",
+     "type": "module",
+  "scripts": {
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest"
+  },
+  "jest": {
+    "transform": {}
+  },
+  "license": "ISC",
+  "devDependencies": {
+    "jest": "^30.2.0"
+  }
+}
